@@ -1,0 +1,134 @@
+<!-- saved from url=(0065)http://math.hws.edu/graphicsbook/source/webgl/simple-texture.html -->
+<!-- modified by Mohammad Imrul Jubair -->
+
+<html>
+<title>LAB-2: Assignment1</title>
+<canvas id="webglcanvas" width="500" height="500"></canvas>
+
+<script>
+
+    var canvas = document.getElementById("webglcanvas");
+    var gl = canvas.getContext("webgl");
+
+    var vertexShaderSource =
+        `attribute vec3 a_coords;
+	   
+	    uniform float u_shift;
+		
+        
+		void main() {
+            gl_Position = vec4(a_coords.x, a_coords.y, a_coords.z, 1.0);
+            gl_PointSize = u_shift;
+			
+        }`;
+
+    var fragmentShaderSource =
+        `precision mediump float;
+        uniform vec3 u_color;
+        void main() {
+            gl_FragColor = vec4(u_color, 1.0);
+        }`;
+
+    var vsh = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vsh, vertexShaderSource);
+    gl.compileShader(vsh);
+
+    var fsh = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fsh, fragmentShaderSource);
+    gl.compileShader(fsh);
+
+    var prog = gl.createProgram();
+
+    gl.attachShader(prog, vsh);
+    gl.attachShader(prog, fsh);
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    var a_coords_location = gl.getAttribLocation(prog, "a_coords");
+    //var ps_loction = gl.getAttribLocation(prog, "ps")
+
+    var coords = [0, 0, 0];
+
+    var a_coords_buffer = gl.createBuffer();
+    u_color_location = gl.getUniformLocation(prog, "u_color");
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_coords_location, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_coords_location);
+
+    var u_shift_location = gl.getUniformLocation(prog, "u_shift");
+    var shift = 4.0;
+    gl.uniform1f(u_shift_location, shift);
+
+
+    var radius = 0;
+    var angle = 0;
+    var angley = 0
+    var n = 2;
+    var x, y;
+    var numPoints = 1;
+    gl.clearColor(0.75, 0.75, 0.75, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINTS, 0, numPoints);
+
+
+
+
+
+
+    canvas.onmousedown = function () {
+
+        shift = shift + 0.01;
+        gl.uniform1f(u_shift_location, shift);
+        for (var a = 0; a < 360; a += .03) {
+
+
+            if (n % 2 == 0) {
+                var r = Math.cos(n * a);
+                x = r * Math.cos(a);
+                y = r * Math.sin(a);
+                coords.push(x, y, 0.0);
+                var color = new Float32Array([0.5, 0.7, 0.3]);
+            }
+
+            else {
+
+                var r = Math.cos(n * a);
+                x = r * Math.cos(a);
+                y = r * Math.sin(a);
+                coords.push(x, y, 0.0);
+                var color = new Float32Array([0.7, 0.3, 0.5]);
+
+            }
+
+
+        }
+        n = n + 1;
+        r = 0;
+
+        gl.clearColor(0.75, 0.75, 0.75, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.bindBuffer(gl.ARRAY_BUFFER, a_coords_buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW);
+
+
+
+
+
+        gl.vertexAttribPointer(a_coords_location, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(a_coords_location);
+
+        //gl.uniform3fv(u_color_location,color);
+        numPoints = numPoints + 360;
+        gl.uniform3fv(u_color_location, color);
+        gl.drawArrays(gl.POINTS, 0, numPoints);
+        coords = [0, 0, 0];
+
+    };
+
+</script>
+
+
+
+</html>
